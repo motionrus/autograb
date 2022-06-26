@@ -11,3 +11,6 @@ class Ad(models.Model):
     date = models.CharField(max_length=255)
     url = models.URLField()
     status = models.CharField(max_length=100)
+    # created
+    # updated
+
