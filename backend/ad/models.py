@@ -5,12 +5,12 @@ from django.db import models
 
 class Ad(models.Model):
     name = models.CharField(max_length=255)
-    price = models.IntegerField()
-    rating = models.CharField(max_length=255)
-    description = models.TextField()
-    date = models.CharField(max_length=255)
-    url = models.URLField()
-    status = models.CharField(max_length=100)
+    price = models.CharField(max_length=255)
+    rating = models.CharField(max_length=255, null=True)
+    description = models.TextField(null=True)
+    date = models.CharField(max_length=255, null=True)
+    url = models.URLField(unique=True)
+    status = models.CharField(max_length=100, null=True)
     # created
     # updated
 
