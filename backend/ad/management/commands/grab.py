@@ -10,12 +10,13 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
-    def handle(self, *args, **options):
-        pagination_parser = PaginationParser(max_page_count=1)
-        pagination_parser.parse()
-
-        for data in pagination_parser.clear_data:
+    @staticmethod
+    def save(clear_data):
+        for data in clear_data:
             ad, created = Ad.objects.update_or_create(url=data['url'], defaults=data)
             if not created:
                 ad.save()
 
+    def handle(self, *args, **options):
+        pagination_parser = PaginationParser(max_page_count=100)
+        pagination_parser.parse(callback=self.save)

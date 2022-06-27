@@ -1,4 +1,5 @@
 import os, json
+import time
 from typing import List, Dict, TypedDict
 
 from selenium import webdriver
@@ -10,6 +11,7 @@ class MyClass(TypedDict):
     price: str
     description: str
     url: str
+
 
 class PaginationParser:
     url = 'https://www.avito.ru/rossiya/avtomobili'
@@ -24,11 +26,12 @@ class PaginationParser:
     def clear_data(self) -> List[MyClass]:
         return json.loads(json.dumps(self.data, indent=4, sort_keys=True, ensure_ascii=False))
 
-    def parse(self):
+    def parse(self, callback=lambda x: x):
         service = Service(os.getenv("SELENIUM_ENGINE_PATH"))
         driver = webdriver.Chrome(service=service)
         results = []
         for i in range(1, self.max_page_count):
+            time.sleep(1)
             driver.get(self.url + f"?p={i}")
             results = (driver.execute_script("""
                 return [...document.querySelector('[data-marker=catalog-serp]')
@@ -42,6 +45,7 @@ class PaginationParser:
                         }
                     })
             """))
+            callback(results)
         driver.quit()
         self.data = results
 
@@ -54,5 +58,3 @@ if __name__ == "__main__":
     pagination_parser = PaginationParser(max_page_count=1)
     pagination_parser.parse()
     print(json.dumps(pagination_parser.clear_data, indent=4, sort_keys=True, ensure_ascii=False))
-
-
