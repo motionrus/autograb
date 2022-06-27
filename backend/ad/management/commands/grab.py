@@ -15,10 +15,7 @@ class Command(BaseCommand):
         pagination_parser.parse()
 
         for data in pagination_parser.clear_data:
-            ad, created = Ad.objects.get_or_create(url=data['url'], defaults=data)
+            ad, created = Ad.objects.update_or_create(url=data['url'], defaults=data)
             if not created:
-                ad.name = data['name']
-                ad.description = data['description']
-                ad.price = data['price']
                 ad.save()
 
