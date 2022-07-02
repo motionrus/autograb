@@ -49,7 +49,7 @@ function App() {
     if (sorter.order === "ascend") order = `&ordering=-${sorter.field}`
     if (sorter.order === "descend") order = `&ordering=${sorter.field}`
     setOrderBy(order)
-    setPagination({current: pagination.current, ...pagination})
+    setPagination({...pagination, current: pagination.current})
   };
   const [pagination, setPagination] = useState({
     current: 1,
