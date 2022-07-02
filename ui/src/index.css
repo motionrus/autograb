@@ -19,8 +19,8 @@ code {
 
 
 .grabber-content {
-  margin: 16px;
-  max-width: 768px;
+  margin: auto;
+  max-width: 1489px;
 }
 
 .grabber-content__header {
@@ -28,4 +28,15 @@ code {
   align-items: baseline;
   gap: 16px;
   justify-content: flex-end;
+  margin: 83px 16px 41px;
+
+}
+
+.grabber-content__table {
+  margin: 16px;
+}
+
+.table-description {
+  max-height: 100px;
+  overflow-y: auto;
 }
