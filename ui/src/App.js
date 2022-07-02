@@ -1,6 +1,6 @@
 import './App.css';
 import 'antd/dist/antd.css';
-import {Button, Table} from "antd";
+import {Button, Spin, Table} from "antd";
 import Header from "./Header/Header";
 import {useEffect, useState} from "react";
 import axios from "axios";
@@ -56,8 +56,9 @@ function App() {
   });
   const [data, setData] = useState([])
   const [orderBy, setOrderBy] = useState("&ordering=-rating")
-
+  const [loading, setLoading] = useState(false)
   useEffect(() => {
+    setLoading(true)
     axios.get(`/api/ads/?page=${pagination.current}${orderBy}`)
       .then((response) => {
         setData(response.data.results.map(data => ({
@@ -72,6 +73,7 @@ function App() {
           }))
         )
         if (!pagination.total) setPagination({...pagination, total: response.data.count})
+        setLoading(false)
       })
   }, [orderBy, pagination])
 
@@ -82,13 +84,15 @@ function App() {
       <div className="grabber-content">
         <div className="grabber-content__header">Последнее обновление: 4 часа назад<Button
           type="primary">Обновить</Button></div>
-        <Table
-          className="grabber-content__table"
-          dataSource={data}
-          columns={columns}
-          onChange={onChange}
-          pagination={pagination}
-        />;
+        <Spin spinning={loading} delay={500}>
+          <Table
+            className="grabber-content__table"
+            dataSource={data}
+            columns={columns}
+            onChange={onChange}
+            pagination={pagination}
+          />
+        </Spin>
       </div>
     </div>
   );
