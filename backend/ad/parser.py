@@ -20,7 +20,7 @@ class PaginationParser:
     data = []
     count_tries = 3
 
-    def __init__(self, max_page_count):
+    def __init__(self, max_page_count=0):
         if max_page_count:
             self.max_page_count = max_page_count + 1
 
@@ -57,8 +57,13 @@ class PaginationParser:
         """)
 
 
-class AdParser:
-    pass
+class AdParser(PaginationParser):
+    def get_best_price(self, url):
+        self.driver.get(url)
+        return self.driver.execute_script("""
+            const result = document.querySelector('h4[class*=styles-heading]')?.nextElementSibling.firstChild.textContent
+            return result ? result.replace(/\xA0/g,' ') : ""
+        """)
 
 
 if __name__ == "__main__":

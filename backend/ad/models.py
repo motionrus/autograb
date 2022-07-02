@@ -1,7 +1,6 @@
 from django.db import models
+import re
 
-
-# Create your models here.
 
 class Ad(models.Model):
     name = models.CharField(max_length=255)
@@ -11,6 +10,25 @@ class Ad(models.Model):
     date = models.CharField(max_length=255, null=True)
     url = models.URLField(unique=True)
     status = models.CharField(max_length=100, null=True)
-    # created
-    # updated
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def rating_number(self):
+        try:
+            if self.rating:
+                sign = -1 if "дешевле" in self.rating else 1
+                return int(re.sub(r'\D+', '', self.rating)) * sign
+        except ValueError:
+            pass
+        return 0
+
+    @rating_number.setter
+    def rating_number(self, value):
+        pass
+
+
+class Parser(models.Model):
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
