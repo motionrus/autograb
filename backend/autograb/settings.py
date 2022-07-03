@@ -11,10 +11,16 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
+import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -39,7 +45,19 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'ad',
+    'django_rq',
 ]
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': env.db('REDIS_URL')["HOST"],
+        'PORT': env.db('REDIS_URL')["PORT"],
+        'DB': env.db('REDIS_URL')["NAME"],
+        'DEFAULT_TIMEOUT': 360,
+    },
+}
+
+RQ_EXCEPTION_HANDLERS = ['path.to.my.handler'] # If you need custom exception handlers
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -84,10 +102,7 @@ WSGI_APPLICATION = 'autograb.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db("POSTGRES_URL")
 }
 
 

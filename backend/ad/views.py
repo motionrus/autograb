@@ -1,7 +1,5 @@
-import django_filters
-from rest_framework import views, viewsets, serializers
+from rest_framework import viewsets, serializers
 from ad.models import Ad
-
 from rest_framework import filters
 
 
