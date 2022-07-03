@@ -72,7 +72,7 @@ function App() {
               href={data.url} target="_blank">open</a>
           }))
         )
-        if (!pagination.total) setPagination({...pagination, total: response.data.count})
+        if (pagination.total === undefined) setPagination({...pagination, total: response.data.count})
         setLoading(false)
       })
   }, [orderBy, pagination])
