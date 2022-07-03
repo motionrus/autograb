@@ -6,10 +6,10 @@ services:
     volumes:
       - db_volume:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=autograb
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  web:
+  backend:
     build: backend
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
@@ -17,11 +17,16 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_URL=postgres://postgres:postgres@db/autograb
+    env_file:
+      .env
     depends_on:
       - db
+  ui:
+    build: ui
+    ports:
+      - "4848:80"
+
 volumes:
   db_volume:
     external: true
