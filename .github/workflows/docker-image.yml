@@ -18,17 +18,23 @@ jobs:
 
     steps:
       - name: Configure git
-        env:
-          TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: git config --global url."https://${TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-      
-      - name: Git clone
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
-          run: |
+          script: |
+            git config --global url."https://${TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+      
+      - name: Git clone
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
             git clone https://github.com/motionrus/autograb.git
       
       - name: Deploy
