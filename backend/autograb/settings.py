@@ -9,12 +9,18 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+from urllib.parse import urlparse
 
+import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -25,7 +31,8 @@ SECRET_KEY = 'django-insecure-g-c4mj9^mbt9c&jha10kjrjyk5-@^7bfuorl@uqk=z4$(w(-^+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Application definition
 
@@ -37,8 +44,27 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'ad',
+    'django_rq',
 ]
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': env.db('REDIS_URL')["HOST"],
+        'PORT': env.db('REDIS_URL')["PORT"],
+        'DB': env.db('REDIS_URL')["NAME"],
+        'DEFAULT_TIMEOUT': 360,
+    },
+}
+
+RQ_EXCEPTION_HANDLERS = ['path.to.my.handler'] # If you need custom exception handlers
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -51,6 +77,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'autograb.urls'
+
+SELENIUM_ENGINE_PATH = os.getenv("SELENIUM_ENGINE_PATH")
 
 TEMPLATES = [
     {
@@ -75,10 +103,7 @@ WSGI_APPLICATION = 'autograb.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db("POSTGRES_URL")
 }
 
 
