@@ -21,7 +21,9 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            if [ ! -d "autograb" ] && git clone https://{TOKEN}@github.com/motionrus/autograb.git
+            if [ ! -d "autograb" ]; then
+                git clone https://{TOKEN}@github.com/motionrus/autograb.git;
+            fi
             cd autograb
             git pull
       
