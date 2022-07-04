@@ -4,10 +4,6 @@ name: CI to Docker Hub
 
 # Controls when the workflow will run
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -25,17 +21,9 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            git config --global url."https://${TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-      
-      - name: Git clone
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
-            git clone https://github.com/motionrus/autograb.git
+            if [ ! -d "autograb" ] && git clone https://{TOKEN}@github.com/motionrus/autograb.git
+            cd autograb
+            git pull
       
       - name: Deploy
         uses: appleboy/ssh-action@master
