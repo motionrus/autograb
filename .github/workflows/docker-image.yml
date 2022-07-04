@@ -26,6 +26,21 @@ jobs:
             fi
             cd autograb
             git pull
+            
+      - name: Update env
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd autograb
+            touch .env
+            echo POSTGRES_URL=${{ secrets.POSTGRES_URL }} >> .env
+            echo REDIS_URL=${{ secrets.REDIS_URL }} >> .env
+            echo SELENIUM_ENGINE_PATH=${{ secrets.SELENIUM_ENGINE_PATH }} >> .env
+            echo CHROME_LOCATION=${{ secrets.CHROME_LOCATION }} >> .env
       
       - name: Deploy
         uses: appleboy/ssh-action@master
