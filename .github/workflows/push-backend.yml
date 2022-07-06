@@ -17,8 +17,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./backend
-          file: Dockerfile
+          context: .
+          file: ./backend/Dockerfile
           push: true
           tags: ${{ github.actor }}/autograb-backend:latest
 
