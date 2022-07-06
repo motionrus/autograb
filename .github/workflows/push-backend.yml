@@ -15,10 +15,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.TOKEN }}
       - name: Build and push
-        id: docker_build
         uses: docker/build-push-action@v3
         with:
-          context: ./
+          context: .
           file: ./backend/Dockerfile
           push: true
           tags: ghcr.io/${{ github.actor }}/autograb-backend:latest
