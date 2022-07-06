@@ -18,9 +18,9 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: backend/Dockerfile
+          file: ./backend/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.actor }}/autograb-backend:latest
+          tags: ${{ github.actor }}/autograb-backend:latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
