@@ -20,7 +20,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ github.actor }}/autograb-backend:latest
+          tags: ghcr.io/${{ github.actor }}/autograb-backend:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
