@@ -13,6 +13,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
+      - name: Configure git
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            if [ ! -d "autograb" ]; then
+                git clone https://{TOKEN}@github.com/motionrus/autograb.git;
+            fi
+            cd autograb
+            git pull
             
       - name: Update env
         uses: appleboy/ssh-action@master
