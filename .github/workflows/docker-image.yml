@@ -52,4 +52,4 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             sudo docker volume create --name=db_volume
-            cd autograb && sudo docker-compose up -d
+            cd autograb && sudo docker compose up -d
