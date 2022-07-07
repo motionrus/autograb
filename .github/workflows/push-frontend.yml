@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Frontend Image Build and Push
 
 on:
   workflow_dispatch:
