@@ -23,10 +23,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./backend/
-          file: ./backend/Dockerfile
+          context: ./ui/
+          file: ./ui/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.actor }}/autograb-backend:latest
+          tags: ghcr.io/${{ github.actor }}/autograb-ui:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
