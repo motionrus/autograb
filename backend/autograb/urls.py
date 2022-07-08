@@ -21,4 +21,5 @@ import ad.urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(ad.urls)),
+    path('api/django-rq/', include('django_rq.urls'))
 ]

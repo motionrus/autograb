@@ -1,6 +1,11 @@
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets, serializers, views
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 from ad.models import Ad
 from rest_framework import filters
+import django_rq
+from django.core.management import call_command
 
 
 class Ordering(filters.OrderingFilter):
@@ -38,3 +43,9 @@ class AdViewSet(viewsets.ModelViewSet):
     serializer_class = AdSerializer
     filter_backends = [Ordering]
     ordering_fields = ('name', 'price', 'rating', 'updated_at')
+
+
+@api_view(['GET'])
+def grab(request):
+    django_rq.enqueue(call_command, "grab")
+    return Response({})

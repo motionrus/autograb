@@ -3,8 +3,6 @@ import time
 from typing import List, Dict, TypedDict
 
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 
 class MyClass(TypedDict):
@@ -23,11 +21,13 @@ class PaginationParser:
     def __init__(self, max_page_count=0):
         if max_page_count:
             self.max_page_count = max_page_count + 1
-
-        options = ChromeOptions()
-        options.binary_location = os.getenv("CHROME_LOCATION")
-        service = Service(os.getenv("SELENIUM_ENGINE_PATH"))
-        self.driver = webdriver.Chrome(service=service, options=options)
+        options = webdriver.ChromeOptions()
+        options.add_argument('--ignore-ssl-errors=yes')
+        options.add_argument('--ignore-certificate-errors')
+        self.driver = webdriver.Remote(
+            command_executor='http://localhost:4444/wd/hub',
+            options=options
+        )
 
     @property
     def clear_data(self) -> List[MyClass]:
@@ -42,6 +42,7 @@ class PaginationParser:
         self.data = results
 
     def get_ads(self, url):
+        print(url)
         self.driver.get(url)
         return self.driver.execute_script("""
             return [...document.querySelector('[data-marker=catalog-serp]')

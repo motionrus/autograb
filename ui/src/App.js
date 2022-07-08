@@ -59,7 +59,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   useEffect(() => {
     setLoading(true)
-    axios.get(`/api/ads/?page=${pagination.current}${orderBy}`)
+    axios.get(`/api/cars/?page=${pagination.current}${orderBy}`)
       .then((response) => {
         setData(response.data.results.map(data => ({
             "key": data.id,

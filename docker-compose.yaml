@@ -9,8 +9,11 @@ services:
       - POSTGRES_DB=autograb
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+  redis:
+    image: 'redis:latest'
   backend:
     image: ghcr.io/motionrus/autograb-backend:latest
+    build: backend
     command: >
       sh -c "python manage.py collectstatic --noinput &&
              python manage.py migrate &&
@@ -19,16 +22,33 @@ services:
       - ./backend:/code
     ports:
       - "8000:8000"
-    environment:
-      - POSTGRES_URL=postgres://postgres:postgres@db/autograb
     env_file:
-      .env
+      - .env
     depends_on:
       - db
+      - redis
   ui:
     image: ghcr.io/motionrus/autograb-ui:latest
     ports:
       - "4848:80"
+
+  selenium-hub:
+    image: selenium/hub:4.1.1-20211217
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+
+  chrome:
+    image: selenium/node-chrome:4.1.1-20211217
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
 
 volumes:
   db_volume:

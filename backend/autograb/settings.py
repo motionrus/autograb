@@ -54,11 +54,10 @@ RQ_QUEUES = {
         'HOST': env.db('REDIS_URL')["HOST"],
         'PORT': env.db('REDIS_URL')["PORT"],
         'DB': env.db('REDIS_URL')["NAME"],
+        'PASSWORD': env.db('REDIS_URL')["PASSWORD"],
         'DEFAULT_TIMEOUT': 360,
     },
 }
-
-RQ_EXCEPTION_HANDLERS = ['path.to.my.handler'] # If you need custom exception handlers
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
