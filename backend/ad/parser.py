@@ -2,7 +2,10 @@ import os, json
 import time
 from typing import List, Dict, TypedDict
 
+import django_rq
 from selenium import webdriver
+
+from ad.models import Ad
 
 
 class MyClass(TypedDict):
@@ -17,6 +20,7 @@ class PaginationParser:
     max_page_count = 101
     data = []
     count_tries = 3
+    percentage = 0
 
     def __init__(self, max_page_count=0):
         if max_page_count:
@@ -25,7 +29,7 @@ class PaginationParser:
         options.add_argument('--ignore-ssl-errors=yes')
         options.add_argument('--ignore-certificate-errors')
         self.driver = webdriver.Remote(
-            command_executor='http://localhost:4444/wd/hub',
+            command_executor=os.getenv("SELENIUM_URL"),
             options=options
         )
 
@@ -33,11 +37,14 @@ class PaginationParser:
     def clear_data(self) -> List[MyClass]:
         return json.loads(json.dumps(self.data, indent=4, sort_keys=True, ensure_ascii=False))
 
-    def parse(self, callback=lambda x: x):
+    def parse(self, callback=lambda x, y: x):
         results = []
         for i in range(1, self.max_page_count):
+            self.percentage = int(i / self.max_page_count * 100)
             time.sleep(1)
-            callback(self.get_ads(self.url + f"?p={i}"))
+            print(int((i / self.max_page_count) * 100), i, i / self.max_page_count, )
+            callback(self.get_ads(self.url + f"?p={i}"), self.percentage)
+        self.percentage = 0
         self.driver.quit()
         self.data = results
 

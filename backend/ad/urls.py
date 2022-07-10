@@ -1,10 +1,10 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from ad.views import AdViewSet, grab
+from ad.views import AdViewSet, Grab
 
 urlpatterns = [
-    path('grab/', grab, name='grab'),
+    path('grab/', Grab.as_view(), name='grab'),
 ]
 
 router = routers.SimpleRouter()

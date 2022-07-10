@@ -55,7 +55,7 @@ RQ_QUEUES = {
         'PORT': env.db('REDIS_URL')["PORT"],
         'DB': env.db('REDIS_URL')["NAME"],
         'PASSWORD': env.db('REDIS_URL')["PASSWORD"],
-        'DEFAULT_TIMEOUT': 360,
+        'DEFAULT_TIMEOUT': 3600,
     },
 }
 
@@ -76,8 +76,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'autograb.urls'
-
-SELENIUM_ENGINE_PATH = os.getenv("SELENIUM_ENGINE_PATH")
 
 TEMPLATES = [
     {

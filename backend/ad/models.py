@@ -32,3 +32,5 @@ class Parser(models.Model):
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    percentage = models.IntegerField(default=0)
+    status = models.CharField(max_length=255)

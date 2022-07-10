@@ -18,5 +18,6 @@ class Command(BaseCommand):
                 ad.save()
 
     def handle(self, *args, **options):
+
         pagination_parser = PaginationParser(max_page_count=100)
         pagination_parser.parse(callback=self.save)

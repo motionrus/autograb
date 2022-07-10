@@ -2,10 +2,13 @@ from rest_framework import viewsets, serializers, views
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from ad.job import SingleTonJob
 from ad.models import Ad
 from rest_framework import filters
 import django_rq
 from django.core.management import call_command
+
+from ad.parser import PaginationParser
 
 
 class Ordering(filters.OrderingFilter):
@@ -45,7 +48,11 @@ class AdViewSet(viewsets.ModelViewSet):
     ordering_fields = ('name', 'price', 'rating', 'updated_at')
 
 
-@api_view(['GET'])
-def grab(request):
-    django_rq.enqueue(call_command, "grab")
-    return Response({})
+class Grab(views.APIView):
+    def post(self, request, *args, **kwargs):
+        job = SingleTonJob().get_job()
+        return Response({"updated": job.id})
+
+    def get(self, request, *args, **kwargs):
+        print(SingleTonJob().percentage)
+        return Response({"url": "", "percentage": SingleTonJob().percentage})
