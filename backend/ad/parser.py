@@ -20,11 +20,8 @@ class PaginationParser:
     max_page_count = 101
     data = []
     count_tries = 3
-    percentage = 0
 
-    def __init__(self, max_page_count=0):
-        if max_page_count:
-            self.max_page_count = max_page_count + 1
+    def __init__(self):
         options = webdriver.ChromeOptions()
         options.add_argument('--ignore-ssl-errors=yes')
         options.add_argument('--ignore-certificate-errors')
@@ -37,19 +34,18 @@ class PaginationParser:
     def clear_data(self) -> List[MyClass]:
         return json.loads(json.dumps(self.data, indent=4, sort_keys=True, ensure_ascii=False))
 
-    def parse(self, callback=lambda x, y: x):
-        results = []
-        for i in range(1, self.max_page_count):
-            self.percentage = int(i / self.max_page_count * 100)
-            time.sleep(1)
-            print(int((i / self.max_page_count) * 100), i, i / self.max_page_count, )
-            callback(self.get_ads(self.url + f"?p={i}"), self.percentage)
-        self.percentage = 0
+    def save(self):
+        for data in self.clear_data:
+            ad, created = Ad.objects.update_or_create(url=data['url'], defaults=data)
+            if not created:
+                ad.save()
+
+    def parse(self, i):
+        self.data = self.get_ads(self.url + f"?p={i}")
         self.driver.quit()
-        self.data = results
+        self.save()
 
     def get_ads(self, url):
-        print(url)
         self.driver.get(url)
         return self.driver.execute_script("""
             return [...document.querySelector('[data-marker=catalog-serp]')
@@ -65,6 +61,13 @@ class PaginationParser:
         """)
 
 
+def parse(count):
+    parser = PaginationParser()
+    parser.parse(count)
+    for i in parser.clear_data:
+        django_rq.enqueue(parse_ads, i["url"])
+
+
 class AdParser(PaginationParser):
     def get_best_price(self, url):
         self.driver.get(url)
@@ -72,6 +75,10 @@ class AdParser(PaginationParser):
             const result = document.querySelector('h4[class*=styles-heading]')?.nextElementSibling.firstChild.textContent
             return result ? result.replace(/\xA0/g,' ') : ""
         """)
+
+
+def parse_ads(url):
+    AdParser().parse(url)
 
 
 if __name__ == "__main__":

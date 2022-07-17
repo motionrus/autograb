@@ -55,7 +55,14 @@ RQ_QUEUES = {
         'PORT': env.db('REDIS_URL')["PORT"],
         'DB': env.db('REDIS_URL')["NAME"],
         'PASSWORD': env.db('REDIS_URL')["PASSWORD"],
-        'DEFAULT_TIMEOUT': 3600,
+        'DEFAULT_TIMEOUT': 360,
+    },
+    'high': {
+        'HOST': env.db('REDIS_URL')["HOST"],
+        'PORT': env.db('REDIS_URL')["PORT"],
+        'DB': env.db('REDIS_URL')["NAME"],
+        'PASSWORD': env.db('REDIS_URL')["PASSWORD"],
+        'DEFAULT_TIMEOUT': 360,
     },
 }
 

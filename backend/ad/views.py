@@ -1,15 +1,18 @@
 from rest_framework import viewsets, serializers, views
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rq.job import Job
+from rq.registry import StartedJobRegistry
 
-from ad.job import SingleTonJob
+from ad.job import SingleTonJob, work_ads
 from ad.models import Ad
 from rest_framework import filters
 import django_rq
 from django.core.management import call_command
 
-from ad.parser import PaginationParser
-
+from ad.parser import PaginationParser, parse
+from rq import cancel_job
+import django_rq
 
 class Ordering(filters.OrderingFilter):
     def filter_queryset(self, request, queryset, view):
@@ -50,9 +53,29 @@ class AdViewSet(viewsets.ModelViewSet):
 
 class Grab(views.APIView):
     def post(self, request, *args, **kwargs):
-        job = SingleTonJob().get_job()
-        return Response({"updated": job.id})
+        queue = django_rq.get_queue('high')
+        registry = StartedJobRegistry(queue.name, queue.connection)
+
+        if len(registry) == 0 and len(queue) == 0:
+            for i in range(1, 101):
+                queue.enqueue(parse, i)
+
+        return Response({
+            "queued": queue.get_job_ids(),
+            "active": registry.get_job_ids(),
+            "all": 100,
+        })
+
+    def delete(self, request, *args, **kwargs):
+        queue = django_rq.get_queue('high')
+        registry = StartedJobRegistry(queue.name, queue.connection)
+        if len(registry) > 0:
+            job_id = registry.get_job_ids()[0]
+            Job.fetch(job_id, connection=queue.connection).delete()
+
+            return Response({"delete": job_id})
+        else:
+            return Response({"delete": None})
 
     def get(self, request, *args, **kwargs):
-        print(SingleTonJob().percentage)
         return Response({"url": "", "percentage": SingleTonJob().percentage})

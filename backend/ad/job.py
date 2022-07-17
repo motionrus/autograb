@@ -1,9 +1,7 @@
 import django_rq
-from rq import Worker
 
 from ad.models import Ad
 from ad.parser import PaginationParser
-from redis import StrictRedis
 
 
 def singleton(class_):

@@ -59,7 +59,7 @@ services:
     image: ghcr.io/motionrus/autograb-backend:latest
     build: backend
     command: >
-      sh -c "python manage.py rqworker"
+      sh -c "python manage.py rqworker high default --burst"
     volumes:
       - ./backend:/code
     depends_on:
