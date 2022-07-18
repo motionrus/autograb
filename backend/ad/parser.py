@@ -1,7 +1,8 @@
 import os, json
 import time
 from typing import List, Dict, TypedDict
-
+from rq import Queue
+from redis import Redis
 import django_rq
 from selenium import webdriver
 
@@ -64,9 +65,13 @@ class PaginationParser:
 def parse(count):
     parser = PaginationParser()
     parser.parse(count)
+    redis_conn = Redis()
+    q = Queue('default', connection=redis_conn)
+    urls = [x.args[0] for x in q.get_jobs()]
+
     for i in parser.clear_data:
         ads = Ad.objects.filter(url__exact=i["url"]).first()
-        if ads and (not ads.rating or ads.need_updates):
+        if ads and (not ads.rating or ads.need_updates) and i not in urls:
             django_rq.enqueue(parse_ads, i["url"])
 
 
