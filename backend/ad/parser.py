@@ -65,8 +65,8 @@ class PaginationParser:
 def parse(count):
     parser = PaginationParser()
     parser.parse(count)
-    redis_conn = Redis()
-    q = Queue('default', connection=redis_conn)
+
+    q = django_rq.get_queue('default')
     urls = [x.args[0] for x in q.get_jobs()]
 
     for i in parser.clear_data:
