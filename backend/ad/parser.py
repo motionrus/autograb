@@ -71,7 +71,7 @@ def parse(count):
 
     for i in parser.clear_data:
         ads = Ad.objects.filter(url__exact=i["url"]).first()
-        if ads and (not ads.rating or ads.need_updates) and i not in urls:
+        if ads and (not ads.rating or ads.need_updates) and i["url"] not in urls:
             django_rq.enqueue(parse_ads, i["url"])
 
 
