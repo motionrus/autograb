@@ -12,6 +12,7 @@ class Ad(models.Model):
     status = models.CharField(max_length=100, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    need_updates = models.BooleanField(default=False)
 
     @property
     def rating_number(self):

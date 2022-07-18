@@ -65,7 +65,9 @@ def parse(count):
     parser = PaginationParser()
     parser.parse(count)
     for i in parser.clear_data:
-        django_rq.enqueue(parse_ads, i["url"])
+        ads = Ad.objects.filter(url__exact=i["url"]).first()
+        if ads and (not ads.rating or ads.need_updates):
+            django_rq.enqueue(parse_ads, i["url"])
 
 
 class AdParser(PaginationParser):
