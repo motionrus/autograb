@@ -40,4 +40,4 @@ def save(clear_data, percentage):
 
 def work_ads(*args, **kwargs):
     pagination_parser = PaginationParser(max_page_count=100)
-    pagination_parser.parse(callback=save)
+    pagination_parser.run(callback=save)

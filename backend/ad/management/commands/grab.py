@@ -20,4 +20,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         pagination_parser = PaginationParser(max_page_count=100)
-        pagination_parser.parse()
+        pagination_parser.run()

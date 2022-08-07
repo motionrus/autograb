@@ -1,8 +1,9 @@
+from django_rq.utils import get_statistics
 from rest_framework import viewsets, serializers, views
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rq.job import Job
-from rq.registry import StartedJobRegistry
+from rq.registry import StartedJobRegistry, FailedJobRegistry
 
 from ad.job import SingleTonJob, work_ads
 from ad.models import Ad
@@ -10,7 +11,7 @@ from rest_framework import filters
 import django_rq
 from django.core.management import call_command
 
-from ad.parser import PaginationParser, parse
+from ad.parser import PaginationParser, parse_pages
 from rq import cancel_job
 import django_rq
 
@@ -57,13 +58,12 @@ class Grab(views.APIView):
         registry = StartedJobRegistry(queue.name, queue.connection)
 
         if len(registry) == 0 and len(queue) == 0:
-            for i in range(1, 101):
-                queue.enqueue(parse, i)
+            for page in range(1, 2):
+                queue.enqueue(parse_pages, page)
 
         return Response({
             "queued": queue.get_job_ids(),
             "active": registry.get_job_ids(),
-            "all": 100,
         })
 
     def delete(self, request, *args, **kwargs):
@@ -78,4 +78,4 @@ class Grab(views.APIView):
             return Response({"delete": None})
 
     def get(self, request, *args, **kwargs):
-        return Response({"url": "", "percentage": SingleTonJob().percentage})
+        return Response(get_statistics())

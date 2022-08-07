@@ -25,5 +25,5 @@ class Command(BaseCommand):
         for ad in ads:
             count += 1
             print(f"{int(count / ads_count * 100)}/100% ad.url")
-            ad.rating = ad_parser.get_best_price(ad.url)
+            ad.rating = ad_parser.parse_pages(ad.url)
             ad.save()
