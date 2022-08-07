@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rq.job import Job
 from rq.registry import StartedJobRegistry, FailedJobRegistry
 
-from ad.job import SingleTonJob, work_ads
 from ad.models import Ad
 from rest_framework import filters
 import django_rq

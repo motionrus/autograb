@@ -1,12 +1,11 @@
 import datetime
 import os, json
 import time
-from typing import List, Dict, TypedDict
-from rq import Queue
-from redis import Redis
+import random
+from typing import List, TypedDict
 import django_rq
-from selenium import webdriver
 
+from ad.driver import driver
 from ad.models import Ad
 
 
@@ -21,13 +20,7 @@ class PaginationParser:
     count_tries = 3
 
     def __init__(self, url, script):
-        options = webdriver.ChromeOptions()
-        options.add_argument('--ignore-ssl-errors=yes')
-        options.add_argument('--ignore-certificate-errors')
-        self.driver = webdriver.Remote(
-            command_executor=os.getenv("SELENIUM_URL"),
-            options=options
-        )
+        self.driver = driver
         self.url = url
         self.script = script
 
@@ -35,16 +28,15 @@ class PaginationParser:
         self.driver.get(self.url)
         count = self.count_tries
         while count:
+            time.sleep(random.randint(2, 5))
             result = self.driver.execute_script(self.script)
             if not result:
                 self.driver.refresh()
-                time.sleep(2)
                 count -= 1
             else:
                 return result
 
     def quit(self):
-        time.sleep(1)
         self.driver.quit()
 
 
@@ -86,8 +78,6 @@ def parse_pages(page):
         if need_updates and car["url"] not in urls:
             django_rq.enqueue(parse_cars, car["url"])
 
-    parser.quit()
-
 
 def parse_cars(url):
     ad = Ad.objects.filter(url__exact=url).first()
@@ -98,10 +88,3 @@ def parse_cars(url):
     parser = PaginationParser(ad.url, script)
     ad.rating = parser.parse()
     ad.save()
-    parser.quit()
-
-
-if __name__ == "__main__":
-    pagination_parser = PaginationParser(max_page_count=1)
-    pagination_parser.run()
-    print(json.dumps(pagination_parser.clear_data, indent=4, sort_keys=True, ensure_ascii=False))
