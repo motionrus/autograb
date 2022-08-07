@@ -10,11 +10,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - "5432:5432"
+      - "15432:5432"
   redis:
     image: 'redis:latest'
     ports:
-      - "6379:6379"
+      - "16379:6379"
 
   backend:
     image: ghcr.io/motionrus/autograb-backend:latest
