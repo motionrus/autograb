@@ -1,18 +1,15 @@
 from django_rq.utils import get_statistics
 from rest_framework import viewsets, serializers, views
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rq.job import Job
-from rq.registry import StartedJobRegistry, FailedJobRegistry
+from rq.registry import StartedJobRegistry
 
 from ad.models import Ad
 from rest_framework import filters
-import django_rq
-from django.core.management import call_command
 
-from ad.parser import PaginationParser, parse_pages
-from rq import cancel_job
+from ad.parser import parse_pages
 import django_rq
+
 
 class Ordering(filters.OrderingFilter):
     def filter_queryset(self, request, queryset, view):
@@ -57,7 +54,7 @@ class Grab(views.APIView):
         registry = StartedJobRegistry(queue.name, queue.connection)
 
         if len(registry) == 0 and len(queue) == 0:
-            for page in range(1, 2):
+            for page in range(1, 101):
                 queue.enqueue(parse_pages, page)
 
         return Response({
