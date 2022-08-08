@@ -5,6 +5,7 @@ from ad.driver import driver, redis_cursor
 
 
 def signal_handler(signal_num, frame):
+    print(f"Remove Selenium Session from Redis: {redis_cursor.get('session')}")
     redis_cursor.set("session", "")
     driver.quit()
 

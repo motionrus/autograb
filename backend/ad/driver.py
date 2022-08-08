@@ -1,9 +1,24 @@
 import os
+from urllib.parse import urlparse
+
+import environ
+import redis
+import requests
 from selenium import webdriver
-import redis, environ
+
+
+def get_session(data):
+    try:
+        return data['value']['nodes'][0]['slots'][0]['session']['sessionId']
+    except KeyError:
+        return ""
+
 
 # INIT REDIS
 env = environ.Env()
+selenium_url = urlparse(os.getenv("SELENIUM_URL"))
+
+is_selenium_hub = 'hub' in selenium_url.path
 redis_env = env.db('REDIS_URL')
 
 redis_cursor = redis.Redis(
@@ -18,18 +33,22 @@ options.add_argument('--ignore-certificate-errors')
 options.add_extension("./extension_5_0_4_0.crx")
 
 driver = webdriver.Chrome(options=options)
+driver.quit()
 session = redis_cursor.get("session").decode()
 
+if is_selenium_hub:
+    url = f"{selenium_url.scheme}://{selenium_url.netloc}"
+    status_data = requests.get(f"{url}/status").json()
+    session = get_session(status_data)
+
 if session:
-    driver.command_executor._url = os.getenv("SELENIUM_URL")
+    driver.command_executor._url = selenium_url.geturl()
     driver.session_id = session
 else:
     driver = webdriver.Remote(
-        command_executor=os.getenv("SELENIUM_URL"),
+        command_executor=selenium_url.geturl(),
         options=options
     )
     redis_cursor.set("session", driver.session_id)
 
-
-print(driver.command_executor._url)
-print(driver.session_id)
+print(f"Start Selenium Session: {redis_cursor.get('session').decode()}")
