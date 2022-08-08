@@ -12,6 +12,8 @@ def get_session(data):
         return data['value']['nodes'][0]['slots'][0]['session']['sessionId']
     except KeyError:
         return ""
+    except TypeError:
+        return ""
 
 
 # INIT REDIS
