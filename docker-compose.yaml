@@ -32,6 +32,7 @@ services:
     depends_on:
       - db
       - redis
+      - selenium-hub
   ui:
     image: ghcr.io/motionrus/autograb-ui:latest
     ports:
@@ -65,6 +66,7 @@ services:
     depends_on:
       - db
       - redis
+      - selenium-hub
     env_file:
       - .env
 
