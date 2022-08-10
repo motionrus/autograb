@@ -40,8 +40,7 @@ jobs:
             touch .env
             echo POSTGRES_URL=${{ secrets.POSTGRES_URL }} >> .env
             echo REDIS_URL=${{ secrets.REDIS_URL }} >> .env
-            echo SELENIUM_ENGINE_PATH=${{ secrets.SELENIUM_ENGINE_PATH }} >> .env
-            echo CHROME_LOCATION=${{ secrets.CHROME_LOCATION }} >> .env
+            echo SELENIUM_URL=${{ secrets.SELENIUM_URL }} >> .env
       
       - name: Deploy
         uses: appleboy/ssh-action@master
