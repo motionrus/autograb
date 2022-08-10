@@ -14,6 +14,16 @@ jobs:
 
     steps:
     
+      - name: Echo My Secret
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            echo ${{ secrets.TOKEN }}
+    
       - name: Configure git
         uses: appleboy/ssh-action@master
         with:
