@@ -17,7 +17,7 @@ class MyClass(TypedDict):
 
 
 class PaginationParser:
-    count_tries = 3
+    count_tries = 2
 
     def __init__(self, url, script):
         self.driver = driver
@@ -82,7 +82,8 @@ def parse_pages(page):
 def parse_cars(url):
     ad = Ad.objects.filter(url__exact=url).first()
     script = """
-        const result = document.querySelector('h4[class*=styles-heading]')?.nextElementSibling.firstChild.textContent
+        let result = document.querySelector('h4[class*=styles-heading]')?.nextElementSibling?.firstChild?.textContent
+        if (!result) result = document.querySelector('div[class*=styles-theme]')?.firstChild?.firstChild?.firstChild?.firstChild?.textContent 
         return result ? result.replace(/\xA0/g,' ') : ""
     """
     parser = PaginationParser(ad.url, script)

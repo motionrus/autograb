@@ -32,10 +32,11 @@ redis_cursor = redis.Redis(
 options = webdriver.ChromeOptions()
 options.add_argument('--ignore-ssl-errors=yes')
 options.add_argument('--ignore-certificate-errors')
-options.add_extension("./extension_5_0_4_0.crx")
-
+options.add_argument('--headless')
+options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 driver.quit()
+
 session = redis_cursor.get("session").decode()
 
 if is_selenium_hub:
@@ -47,6 +48,10 @@ if session:
     driver.command_executor._url = selenium_url.geturl()
     driver.session_id = session
 else:
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-ssl-errors=yes')
+    options.add_argument('--ignore-certificate-errors')
+    options.add_extension("./extension_5_0_4_0.crx")
     driver = webdriver.Remote(
         command_executor=selenium_url.geturl(),
         options=options
