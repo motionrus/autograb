@@ -50,7 +50,7 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            echo ${{ secrets.TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            sudo echo ${{ secrets.TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
       - name: Deploy
         uses: appleboy/ssh-action@master
@@ -62,4 +62,14 @@ jobs:
           script: |
             sudo docker volume create --name=db_volume
             cd autograb && sudo docker-compose up -d
+            
+      - name: Clear and Logout
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            sudo docker logout ghcr.io
             rm .env
