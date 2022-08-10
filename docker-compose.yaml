@@ -57,7 +57,7 @@ services:
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_SESSION_REQUEST_TIMEOUT=3600
   worker:
-    image: ghcr.io/motionrus/autograb-backend:latest
+    image: motionrus/autograb-backend:latest
     build: backend
     command: >
       sh -c "python manage.py rqworker high default"
