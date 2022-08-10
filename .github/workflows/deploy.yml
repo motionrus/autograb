@@ -72,4 +72,4 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             sudo docker logout ghcr.io
-            rm .env
+            cd autograb && rm .env
