@@ -40,7 +40,7 @@ services:
       - "4848:80"
 
   selenium-hub:
-    image: selenium/hub:4.1.1-20211217
+    image: selenium/hub:latest
     container_name: selenium-hub
     ports:
       - "4442:4442"
@@ -48,7 +48,7 @@ services:
       - "4444:4444"
 
   chrome:
-    image: selenium/node-chrome:4.1.1-20211217
+    image: selenium/node-chrome:latest
     shm_size: 4gb
     depends_on:
       - selenium-hub
