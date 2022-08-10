@@ -37,6 +37,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd autograb
+            rm .env
             touch .env
             echo POSTGRES_URL=${{ secrets.POSTGRES_URL }} >> .env
             echo REDIS_URL=${{ secrets.REDIS_URL }} >> .env
@@ -72,4 +73,3 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             sudo docker logout ghcr.io
-            cd autograb && rm .env
