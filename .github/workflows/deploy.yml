@@ -37,7 +37,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd autograb
-            rm .env
+            rm -f .env
             touch .env
             echo POSTGRES_URL=${{ secrets.POSTGRES_URL }} >> .env
             echo REDIS_URL=${{ secrets.REDIS_URL }} >> .env
