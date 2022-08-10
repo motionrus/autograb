@@ -1,0 +1,79 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Deploy to Server
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+      - name: Configure git
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            if [ ! -d "autograb" ]; then
+                git clone https://${{ secrets.TOKEN }}@github.com/motionrus/autograb.git;
+            fi
+            cd autograb
+            git pull
+            
+      - name: Update env
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd autograb
+            rm -f .env
+            touch .env
+            echo POSTGRES_URL=${{ secrets.POSTGRES_URL }} >> .env
+            echo REDIS_URL=${{ secrets.REDIS_URL }} >> .env
+            echo SELENIUM_URL=${{ secrets.SELENIUM_URL }} >> .env
+      
+      - name: Login to GitHub Container Registry
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            echo ${{ secrets.TOKEN }} | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            sudo docker volume create --name=db_volume
+            cd autograb
+            sudo docker-compose down
+            sudo docker-compose pull
+            sudo docker-compose up -d ui
+            
+            
+      - name: Clear and Logout
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            sudo docker logout ghcr.io
