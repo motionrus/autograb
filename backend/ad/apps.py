@@ -1,12 +1,11 @@
 from django.apps import AppConfig
 from django.core.signals import request_finished
 import signal, sys
-from ad.driver import driver, redis_cursor
+from ad.driver import driver, redis_cursor, session
 
 
 def signal_handler(signal_num, frame):
-    print(f"Remove Selenium Session from Redis: {redis_cursor.get('session')}")
-    redis_cursor.set("session", "")
+    print(f"Close Selenium Session ID: {session}")
     driver.quit()
 
 
