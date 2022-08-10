@@ -22,7 +22,9 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            echo ${{ secrets.TOKEN }}
+          
+            touch .token
+            echo ${{ secrets.TOKEN }} >> .token
     
       - name: Configure git
         uses: appleboy/ssh-action@master
