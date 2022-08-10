@@ -17,7 +17,7 @@ services:
       - "16379:6379"
 
   backend:
-    image: ghcr.io/motionrus/autograb-backend:latest
+    image: motionrus/autograb-backend:latest
     build: backend
     command: >
       sh -c "python manage.py collectstatic --noinput &&
