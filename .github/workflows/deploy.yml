@@ -62,7 +62,11 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             sudo docker volume create --name=db_volume
-            cd autograb && sudo docker-compose up -d
+            cd autograb
+            sudo docker-compose down
+            sudo docker-compose pull
+            sudo docker-compose up -d
+            
             
       - name: Clear and Logout
         uses: appleboy/ssh-action@master
