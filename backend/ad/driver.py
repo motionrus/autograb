@@ -62,7 +62,7 @@ else:
     options.add_argument('--ignore-certificate-errors')
     options.add_extension("./extension_5_0_4_0.crx")
     driver = try_to_get(
-        lambda x: webdriver.Remote(
+        lambda: webdriver.Remote(
             command_executor=selenium_url.geturl(),
             options=options
         )
