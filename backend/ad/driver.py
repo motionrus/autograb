@@ -37,7 +37,9 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 driver.quit()
 
-session = redis_cursor.get("session").decode()
+session = redis_cursor.get("session")
+if session:
+    session = session.decode()
 
 if is_selenium_hub:
     url = f"{selenium_url.scheme}://{selenium_url.netloc}"
