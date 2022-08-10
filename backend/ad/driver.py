@@ -14,6 +14,8 @@ def get_session(data):
         return ""
     except TypeError:
         return ""
+    except IndexError:
+        return ""
 
 
 # INIT REDIS
@@ -43,8 +45,12 @@ if session:
 
 if is_selenium_hub:
     url = f"{selenium_url.scheme}://{selenium_url.netloc}"
-    status_data = requests.get(f"{url}/status").json()
-    session = get_session(status_data)
+    try:
+        status_data = requests.get(f"{url}/status").json()
+        session = get_session(status_data)
+    except requests.exceptions.ConnectionError:
+        pass
+
 
 if session:
     driver.command_executor._url = selenium_url.geturl()
