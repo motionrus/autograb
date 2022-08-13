@@ -43,8 +43,6 @@ selenium_url = urlparse(env.get_value("SELENIUM_URL"))
 url = f"{selenium_url.scheme}://{selenium_url.netloc}"
 
 options = webdriver.ChromeOptions()
-options.add_argument('--ignore-ssl-errors=yes')
-options.add_argument('--ignore-certificate-errors')
 options.add_argument('--headless')
 options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
@@ -64,8 +62,6 @@ if session:
     driver.session_id = session
 else:
     options = webdriver.ChromeOptions()
-    options.add_argument('--ignore-ssl-errors=yes')
-    options.add_argument('--ignore-certificate-errors')
     options.add_extension("./extension_5_0_4_0.crx")
     driver = try_to_get(
         lambda: webdriver.Remote(
