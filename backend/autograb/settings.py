@@ -19,7 +19,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False)
+    DEBUG=(bool, False),
+    REDIS_URL=(str, "redis://0.0.0.0:16379/0"),
+    POSTGRES_URL=(str, "postgres://postgres:postgres@0.0.0.0:15432/autograb"),
+    SELENIUM_URL=(str, "http://0.0.0.0:4444/wd/hub"),
 )
 
 # Quick-start development settings - unsuitable for production

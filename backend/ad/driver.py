@@ -1,7 +1,7 @@
 import os
 from urllib.parse import urlparse
 
-import environ
+from autograb.settings import env
 import time
 import redis
 import requests
@@ -32,7 +32,6 @@ def get_session():
         return ""
 
 
-env = environ.Env()
 redis_env = env.db('REDIS_URL')
 redis_cursor = redis.Redis(
     host=redis_env["HOST"],
@@ -40,7 +39,7 @@ redis_cursor = redis.Redis(
     db=1,
 )
 
-selenium_url = urlparse(os.getenv("SELENIUM_URL"))
+selenium_url = urlparse(env.get_value("SELENIUM_URL"))
 url = f"{selenium_url.scheme}://{selenium_url.netloc}"
 
 options = webdriver.ChromeOptions()
@@ -52,7 +51,7 @@ driver = webdriver.Chrome(options=options)
 driver.quit()
 
 
-if int(os.getenv("WORKER", 0)):
+if int(os.getenv("DOCKER_WORKER", 0)):
     print("WAITING START BACKEND...")
     try_to_get(lambda: requests.get('http://backend:8000/api/grab/'))
 
