@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: [DEV] Deploy to Server
+name: "[DEV] Deploy to Server"
 
 # Controls when the workflow will run
 on:
