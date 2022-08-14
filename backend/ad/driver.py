@@ -8,10 +8,24 @@ import requests
 from selenium import webdriver
 
 
+def create_driver(mobile=False):
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    if mobile:
+        mobile_emulation = {"deviceName": "iPhone X"}
+        chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+
+    web_driver = webdriver.Chrome(
+        options=chrome_options,
+    )
+    return web_driver
+
+
 def try_to_get(func):
     count_tries = 0
     while True:
-        time.sleep(5)
+        time.sleep(1)
         try:
             return func()
         except Exception as err:
@@ -20,10 +34,18 @@ def try_to_get(func):
         count_tries += 1
 
 
-def get_session():
+def get_session(browser='chrome'):
     data = requests.get(f"{url}/status").json()
+    sessions = {
+        "chrome": "",
+        "firefox": "",
+        "edge": "",
+    }
     try:
-        return data['value']['nodes'][0]['slots'][0]['session']['sessionId']
+        for node in data['value']['nodes']:
+            node_session = node["slots"][0]["session"]
+            sessions[node["slots"][0]["stereotype"]["browserName"]] = node_session['sessionId'] if node_session else ""
+        return sessions[browser]
     except KeyError:
         return ""
     except TypeError:
@@ -42,25 +64,20 @@ redis_cursor = redis.Redis(
 selenium_url = urlparse(env.get_value("SELENIUM_URL"))
 url = f"{selenium_url.scheme}://{selenium_url.netloc}"
 
-options = webdriver.ChromeOptions()
-options.add_argument('--headless')
-options.add_argument('--no-sandbox')
-driver = webdriver.Chrome(options=options)
-driver.quit()
-
+driver = create_driver()
 
 if int(os.getenv("DOCKER_WORKER", 0)):
     print("WAITING START BACKEND...")
     try_to_get(lambda: requests.get('http://backend:8000/api/grab/'))
 
-
 session = try_to_get(get_session)
 
-
 if session:
+    print(f"Start Selenium with session ID: {session}")
     driver.command_executor._url = selenium_url.geturl()
     driver.session_id = session
 else:
+    print("First start, create session...")
     options = webdriver.ChromeOptions()
     options.add_extension("./extension_5_0_4_0.crx")
     driver = try_to_get(
@@ -69,5 +86,4 @@ else:
             options=options
         )
     )
-
-print(f"Start Selenium Session ID: {session}")
+    print(f"Success, Selenium session ID: {driver.session_id}")

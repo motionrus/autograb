@@ -10,10 +10,13 @@ def to_int(num):
 
 
 @receiver(pre_save, sender=Ad)
-def my_handler(sender, instance: Ad, **kwargs):
+def my_handler(sender, **kwargs):
+    instance: Ad | None = kwargs.get('instance')
+    if not instance:
+        return
     current_instance = Ad.objects.filter(pk=instance.pk).first()
     if current_instance:
-        if to_int(current_instance.price) != to_int(instance.price):
+        if current_instance.price != instance.price:
             instance.need_updates = True
         if current_instance.rating != instance.rating:
-            instance.need_updates = False
+            instance.need_updates = True

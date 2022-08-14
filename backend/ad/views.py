@@ -1,3 +1,4 @@
+from django.db.models import F
 from django_rq.utils import get_statistics
 from rest_framework import viewsets, serializers, views
 from rest_framework.response import Response
@@ -20,9 +21,9 @@ class Ordering(filters.OrderingFilter):
             return queryset
 
         if '-rating' in ordering:
-            return sorted(queryset, key=lambda t: -t.rating_number)
+            return queryset.order_by(F('rating').desc(nulls_last=True))
         if 'rating' in ordering:
-            return sorted(queryset, key=lambda t: t.rating_number)
+            return queryset.order_by(F('rating').asc(nulls_last=True))
 
         return queryset.order_by(*ordering)
 

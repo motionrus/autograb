@@ -3,6 +3,7 @@ import os, json
 import time
 import random
 from typing import List, TypedDict
+
 import django_rq
 
 from ad.driver import driver
@@ -56,9 +57,10 @@ def parse_pages(page):
         return [...document.querySelector('[data-marker=catalog-serp]')
             ?.querySelectorAll('[data-marker=item]')]?.map(marker => {
                 const body = marker.querySelector('div[class*=body]')
+                const price = Number((body.querySelector('div[class*=priceStep]')?.textContent.replace(/\xA0/g, '').replace(/ /gu, '').match(/\d+/)))
                 return {
                     name: body.querySelector('div[class*=titleStep]')?.textContent,
-                    price: body.querySelector('div[class*=priceStep]')?.textContent.replace(/\xA0/g,' '),
+                    price: price ? price : undefined,
                     description: body.querySelector('div[class*=descriptionStep]')?.textContent || '',
                     url: body.querySelector('a').href
                 }
@@ -82,9 +84,18 @@ def parse_pages(page):
 def parse_cars(url):
     ad = Ad.objects.filter(url__exact=url).first()
     script = """
-        let result = document.querySelector('h4[class*=styles-heading]')?.nextElementSibling?.firstChild?.textContent
-        if (!result) result = document.querySelector('div[class*=styles-theme]')?.firstChild?.firstChild?.firstChild?.firstChild?.textContent 
-        return result ? result.replace(/\xA0/g,' ') : ""
+        getPrice = () => {
+            toNumber = (node) => node.innerText.split('—').map(i => i.replace(/[^\d]/gu, '')).filter(i => i !== '').map(i => Number(i))
+            getMediumPrice = (arrNumbers) => arrNumbers.length ? arrNumbers.reduce((previousValue, currentValue) => previousValue + currentValue) / arrNumbers.length : 0
+            nodes = [...document.querySelectorAll('span')].filter(i => i.innerText === 'Подробнее об оценке')[0]?.parentNode?.parentNode?.parentNode?.parentNode
+            textNodes = nodes ? [...nodes?.querySelectorAll('span')].filter(i => i.innerText) : []
+            arrPrice = textNodes.map(t => toNumber(t)).filter(i => Boolean(i.length))
+            if (arrPrice.length && arrPrice.length < 6 ) {
+                medium = getMediumPrice(arrPrice.filter(arr => arr.length === 2)[0] || [])
+                return Math.round(medium - arrPrice[0])	
+            }
+        }
+        return getPrice()
     """
     parser = PaginationParser(ad.url, script)
     ad.rating = parser.parse()
